@@ -229,6 +229,7 @@ MonoBehaviour:
   mouseSensitivity: 1
   verticalLookLimit: 80
   cameraTarget: {fileID: 8494641427056474718}
+  _sprintHeld: 0
 --- !u!143 &3591437108752610964
 CharacterController:
   m_ObjectHideFlags: 0
@@ -331,8 +332,8 @@ MonoBehaviour:
       m_Calls: []
   m_ActionEvents: []
   m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: 
-  m_DefaultActionMap: 
+  m_DefaultControlScheme: Keyboard&Mouse
+  m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!1001 &1160824041919213950
