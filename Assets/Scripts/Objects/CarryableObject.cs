@@ -2,7 +2,7 @@ using Mirror;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class CarryableItem : NetworkBehaviour
+public class CarryableObject : InteractableObject
 {
     [Header("Item Info")]
     [SerializeField]
@@ -28,6 +28,20 @@ public class CarryableItem : NetworkBehaviour
         _rigidbody = GetComponent<Rigidbody>();
     }
 
+    public override void OnInteract(PlayerController player)
+    {
+        if (IsCarried)
+        {
+            return;
+        }
+        player.PickupItem(this);
+    }
+
+    public override string GetPromptText()
+    {
+        return $"Press E to pick up {itemName}";
+    }
+
     public void PickedUpBy(NetworkIdentity carrier)
     {
         _isCarried = true;
@@ -42,11 +56,19 @@ public class CarryableItem : NetworkBehaviour
 
     private void OnCarrierChanged(NetworkIdentity oldCarrier, NetworkIdentity newCarrier)
     {
-        if (newCarrier == null) return;
+        if (newCarrier == null)
+        {
+            _rigidbody.isKinematic = false;
+            _rigidbody.detectCollisions = true;
+            transform.SetParent(null);
+            return;
+        }
 
         PlayerController carrier = newCarrier.GetComponent<PlayerController>();
         if (carrier != null)
         {
+            _rigidbody.isKinematic = true;
+            _rigidbody.detectCollisions = false;
             transform.SetParent(carrier.ItemHolder, false);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;

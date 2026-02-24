@@ -39,7 +39,7 @@ public class PlayerController : NetworkBehaviour
 
     private bool _jumpPressed;
     private bool _sprintHeld;
-    private CarryableItem _carriedItem;
+    private CarryableObject _carriedObject;
     private CharacterController _characterController;
     private float _verticalVelocity;
     private float _verticalRotation;
@@ -119,9 +119,9 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        if (_carriedItem == null)
+        if (_carriedObject == null)
         {
-            TryPickupItem();
+            TryInteract();
         }
     }
 
@@ -132,7 +132,7 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        if (_carriedItem != null)
+        if (_carriedObject != null)
         {
             DropItem();
         }
@@ -209,16 +209,16 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    private void TryPickupItem()
+    private void TryInteract()
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, pickupRadius);
 
-        CarryableItem closest = null;
+        CarryableObject closest = null;
         float shortestDistance = float.MaxValue;
 
         foreach (Collider col in hits)
         {
-            CarryableItem item = col.GetComponent<CarryableItem>();
+            CarryableObject item = col.GetComponent<CarryableObject>();
 
             if (item == null || item.IsCarried)
             {
@@ -235,14 +235,24 @@ public class PlayerController : NetworkBehaviour
 
         if (closest != null)
         {
-            CommandPickupItem(closest.netIdentity);
+            closest.OnInteract(this);
         }
+    }
+
+    public void PickupItem(CarryableObject item)
+    {
+        if (_carriedObject != null)
+        {
+            return;
+        }
+
+        CommandPickupItem(item.netIdentity);
     }
 
     [Command]
     private void CommandPickupItem(NetworkIdentity itemIdentity)
     {
-        CarryableItem item = itemIdentity.GetComponent<CarryableItem>();
+        CarryableObject item = itemIdentity.GetComponent<CarryableObject>();
 
         if (item == null || item.IsCarried)
         {
@@ -256,14 +266,14 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void RpcAttachItem(NetworkIdentity itemIdentity)
     {
-        CarryableItem item = itemIdentity.GetComponent<CarryableItem>();
+        CarryableObject item = itemIdentity.GetComponent<CarryableObject>();
 
         if (item == null)
         {
             return;
         }
 
-        _carriedItem = item;
+        _carriedObject = item;
         item.GetComponent<Rigidbody>().isKinematic = true;
         item.GetComponent<Rigidbody>().detectCollisions = false;
         item.transform.SetParent(itemHolder, false);
@@ -273,18 +283,18 @@ public class PlayerController : NetworkBehaviour
 
     private void DropItem()
     {
-        if (_carriedItem == null)
+        if (_carriedObject == null)
         {
             return;
         }
 
-        CommandDropItem(_carriedItem.netIdentity);
+        CommandDropItem(_carriedObject.netIdentity);
     }
 
     [Command]
     private void CommandDropItem(NetworkIdentity itemIdentity)
     {
-        CarryableItem item = itemIdentity.GetComponent<CarryableItem>();
+        CarryableObject item = itemIdentity.GetComponent<CarryableObject>();
 
         if (item == null)
         {
@@ -298,7 +308,7 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void RpcDetachItem(NetworkIdentity itemIdentity)
     {
-        CarryableItem item = itemIdentity.GetComponent<CarryableItem>();
+        CarryableObject item = itemIdentity.GetComponent<CarryableObject>();
 
         if (item == null)
         {
@@ -309,7 +319,7 @@ public class PlayerController : NetworkBehaviour
         item.GetComponent<Rigidbody>().detectCollisions = true;
         item.transform.SetParent(null);
         item.transform.position = transform.position + transform.forward * 0.6f + Vector3.up * 0.1f;
-        _carriedItem = null;
+        _carriedObject = null;
     }
 
     private void OnDrawGizmosSelected()
