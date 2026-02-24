@@ -8,9 +8,14 @@ using static CarryableObject;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : NetworkBehaviour
 {
+    public CharacterController CharacterController => _characterController;
+    public Vector2 MoveInput => _moveInput;
+
     [Header("Movement")]
     [SerializeField]
     private float moveSpeed = 4f;
+    [SerializeField]
+    private float pushForce = 3f;
     [SerializeField]
     private float sprintMultiplier = 1.5f;
     [SerializeField]
@@ -37,6 +42,12 @@ public class PlayerController : NetworkBehaviour
     private Transform storageAnchor;
     [SerializeField]
     private float pickupRadius = 1.2f;
+
+    [Header("Climbing")]
+    [SerializeField]
+    private ClimbableObject _currentClimbable;
+    [SerializeField]
+    private bool _isClimbing = false;
 
     public Transform ItemAnchor => itemAnchor;
     public Transform StorageAnchor => storageAnchor;
@@ -124,10 +135,13 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        if (_carriedObject == null)
+        if (_isClimbing)
         {
-            TryInteract();
+            StopClimbing();
+            return;
         }
+
+        TryInteract();
     }
 
     public void OnSwap()
@@ -167,6 +181,25 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    public void StartClimbing(ClimbableObject climbable)
+    {
+        _isClimbing = true;
+        _currentClimbable = climbable;
+        _verticalVelocity = 0f;
+    }
+
+    public void StopClimbing()
+    {
+        if (_currentClimbable is Rope rope)
+        {
+            rope.SetSegmentCollisionsIgnored(_characterController, false);
+        }
+
+        _isClimbing = false;
+        _currentClimbable = null;
+        _verticalVelocity = 0f;
+    }
+
     private void Update()
     {
         if (!isLocalPlayer)
@@ -175,7 +208,15 @@ public class PlayerController : NetworkBehaviour
         }
 
         HandleMouseLook();
-        HandleMovement();
+
+        if (_isClimbing)
+        {
+            HandleClimbing();
+        } else
+        {
+            HandleMovement();
+        }
+
         HandleCursorRelock();
     }
 
@@ -213,6 +254,24 @@ public class PlayerController : NetworkBehaviour
         _characterController.Move((moveDir * speed + Vector3.up * _verticalVelocity) * Time.deltaTime);
     }
 
+    private void HandleClimbing()
+    {
+        if (_currentClimbable == null)
+        {
+            StopClimbing();
+            return;
+        }
+
+        _currentClimbable.HandleClimbing(this);
+
+        if (_jumpPressed)
+        {
+            _jumpPressed = false;
+            StopClimbing();
+            _verticalVelocity = 3f;
+        }
+    }
+
     private void HandleCursorRelock()
     {
         if (Mouse.current != null
@@ -233,9 +292,9 @@ public class PlayerController : NetworkBehaviour
 
         foreach (Collider collider in hits)
         {
-            InteractableObject item = collider.GetComponent<InteractableObject>();
+            InteractableObject item = collider.GetComponentInParent<InteractableObject>();
 
-            if (item == null)
+            if (item == null || item is CarryableObject carryable && carryable.IsCarried)
             {
                 continue;
             }
@@ -371,6 +430,18 @@ public class PlayerController : NetworkBehaviour
             _storedObject.transform.localPosition = Vector3.zero;
             _storedObject.transform.localRotation = Quaternion.identity;
         }
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Rigidbody rb = hit.collider.attachedRigidbody;
+        if (rb == null || rb.isKinematic || hit.moveDirection.y < -0.3f)
+        {
+            return;
+        }
+
+        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0f, hit.moveDirection.z);
+        rb.AddForce(pushDir * pushForce, ForceMode.Force);
     }
 
     private void OnDrawGizmosSelected()

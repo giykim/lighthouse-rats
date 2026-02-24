@@ -1,6 +1,7 @@
 using Mirror;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class PushableObject : InteractableObject
 {
     [Header("Push Settings")]

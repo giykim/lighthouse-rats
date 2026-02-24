@@ -1,6 +1,7 @@
 using Mirror;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class CarryableObject : InteractableObject
 {
     public enum ItemSlot { None, Carried, Stored }

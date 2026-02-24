@@ -31,6 +31,7 @@ public class RopeGenerator : NetworkBehaviour
     {
         _segments = new GameObject[segmentCount];
         Rigidbody prevRb = null;
+        NetworkIdentity[] segmentIdentities = new NetworkIdentity[segmentCount];
 
         for (int i = 0; i < segmentCount; i++)
         {
@@ -48,15 +49,14 @@ public class RopeGenerator : NetworkBehaviour
 
             NetworkIdentity netId = segment.AddComponent<NetworkIdentity>();
 
-            CharacterJoint joint = segment.AddComponent<CharacterJoint>();
-            joint.enableProjection = true;
-
             if (i == 0)
             {
                 rb.isKinematic = true;
             }
             else
             {
+                CharacterJoint joint = segment.AddComponent<CharacterJoint>();
+                joint.enableProjection = true;
                 joint.connectedBody = prevRb;
                 SoftJointLimit limit = new SoftJointLimit();
                 limit.limit = 20f;
@@ -69,6 +69,20 @@ public class RopeGenerator : NetworkBehaviour
             _segments[i] = segment;
             prevRb = rb;
             NetworkServer.Spawn(segment);
+            segmentIdentities[i] = netId;
+        }
+
+        RpcReceiveSegments(segmentIdentities);
+    }
+
+    [ClientRpc]
+    private void RpcReceiveSegments(NetworkIdentity[] segmentIdentities)
+    {
+        _segments = new GameObject[segmentIdentities.Length];
+        for (int i = 0; i < segmentIdentities.Length; i++)
+        {
+            if (segmentIdentities[i] != null)
+                _segments[i] = segmentIdentities[i].gameObject;
         }
     }
 
