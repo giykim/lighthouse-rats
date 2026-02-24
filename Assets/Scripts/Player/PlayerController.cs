@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Mirror;
 using System;
+using Mirror.Transports.Encryption;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : NetworkBehaviour
@@ -26,16 +27,21 @@ public class PlayerController : NetworkBehaviour
     [SerializeField]
     private Transform cameraTarget;
 
+    [Header("Item Carrying")]
+    [SerializeField]
+    private Transform itemHolder;
+    [SerializeField]
+    private float pickupRadius = 1.2f;
+
+    public Transform ItemHolder => itemHolder;
+
+    private bool _sprintHeld;
+    private CarryableItem _carriedItem;
     private CharacterController _characterController;
     private float _verticalVelocity;
     private float _verticalRotation;
-
     private Vector2 _moveInput;
     private Vector2 _lookInput;
-    [SerializeField]
-    private bool _sprintHeld;
-
-    private Vector3 UP_VECTOR = Vector3.up;
 
     private void Awake()
     {
@@ -88,8 +94,25 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-        Debug.Log(value.isPressed);
+
         _sprintHeld = value.isPressed;
+    }
+
+    public void OnInteract()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        if (_carriedItem != null)
+        {
+            DropItem();
+        }
+        else
+        {
+            TryPickupItem();
+        }
     }
 
     public void OnCursorUnlock(InputValue value)
@@ -120,7 +143,7 @@ public class PlayerController : NetworkBehaviour
 
     private void HandleMouseLook()
     {
-        transform.Rotate(UP_VECTOR * _lookInput.x * mouseSensitivity);
+        transform.Rotate(Vector3.up * _lookInput.x * mouseSensitivity);
 
         _verticalRotation -= _lookInput.y * mouseSensitivity;
         _verticalRotation = Mathf.Clamp(_verticalRotation, -verticalLookLimit, verticalLookLimit);
@@ -149,5 +172,114 @@ public class PlayerController : NetworkBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
+    }
+
+    private void TryPickupItem()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRadius);
+
+        CarryableItem closest = null;
+        float shortestDistance = float.MaxValue;
+
+        foreach (Collider col in hits)
+        {
+            CarryableItem item = col.GetComponent<CarryableItem>();
+
+            if (item == null || item.IsCarried)
+            {
+                continue;
+            }
+
+            float dist = Vector3.Distance(transform.position, col.transform.position);
+
+            if (dist < shortestDistance) {
+                shortestDistance = dist;
+                closest = item;
+            }
+        }
+
+        if (closest != null)
+        {
+            CommandPickupItem(closest.netIdentity);
+        }
+    }
+
+    [Command]
+    private void CommandPickupItem(NetworkIdentity itemIdentity)
+    {
+        CarryableItem item = itemIdentity.GetComponent<CarryableItem>();
+
+        if (item == null || item.IsCarried)
+        {
+            return;
+        }
+
+        item.PickedUpBy(netIdentity);
+        RpcAttachItem(itemIdentity);
+    }
+
+    [ClientRpc]
+    private void RpcAttachItem(NetworkIdentity itemIdentity)
+    {
+        CarryableItem item = itemIdentity.GetComponent<CarryableItem>();
+
+        if (item == null)
+        {
+            return;
+        }
+
+        _carriedItem = item;
+        item.GetComponent<Rigidbody>().isKinematic = true;
+        item.GetComponent<Rigidbody>().detectCollisions = false;
+        item.transform.SetParent(itemHolder, false);
+        item.transform.localPosition = Vector3.zero;
+        item.transform.localRotation = Quaternion.identity;
+    }
+
+    private void DropItem()
+    {
+        if (_carriedItem == null)
+        {
+            return;
+        }
+
+        CommandDropItem(_carriedItem.netIdentity);
+    }
+
+    [Command]
+    private void CommandDropItem(NetworkIdentity itemIdentity)
+    {
+        CarryableItem item = itemIdentity.GetComponent<CarryableItem>();
+
+        if (item == null)
+        {
+            return;
+        }
+
+        item.Dropped();
+        RpcDetachItem(itemIdentity);
+    }
+
+    [ClientRpc]
+    private void RpcDetachItem(NetworkIdentity itemIdentity)
+    {
+        CarryableItem item = itemIdentity.GetComponent<CarryableItem>();
+
+        if (item == null)
+        {
+            return;
+        }
+
+        item.GetComponent<Rigidbody>().isKinematic = false;
+        item.GetComponent<Rigidbody>().detectCollisions = true;
+        item.transform.SetParent(null);
+        item.transform.position = transform.position + transform.forward * 0.6f + Vector3.up * 0.1f;
+        _carriedItem = null;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, pickupRadius);
     }
 }
