@@ -1,7 +1,6 @@
 using Mirror;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
 public class CarryableObject : InteractableObject
 {
     [Header("Item Info")]
@@ -11,7 +10,6 @@ public class CarryableObject : InteractableObject
     private Sprite itemIcon;
 
     [SyncVar]
-    [SerializeField]
     private bool _isCarried;
 
     [SyncVar(hook = nameof(OnCarrierChanged))]

@@ -213,22 +213,22 @@ public class PlayerController : NetworkBehaviour
     {
         Collider[] hits = Physics.OverlapSphere(transform.position, pickupRadius);
 
-        CarryableObject closest = null;
+        InteractableObject closest = null;
         float shortestDistance = float.MaxValue;
 
-        foreach (Collider col in hits)
+        foreach (Collider collider in hits)
         {
-            CarryableObject item = col.GetComponent<CarryableObject>();
+            InteractableObject item = collider.GetComponent<InteractableObject>();
 
-            if (item == null || item.IsCarried)
+            if (item == null)
             {
                 continue;
             }
 
-            float dist = Vector3.Distance(transform.position, col.transform.position);
+            float distance = Vector3.Distance(transform.position, collider.transform.position);
 
-            if (dist < shortestDistance) {
-                shortestDistance = dist;
+            if (distance < shortestDistance) {
+                shortestDistance = distance;
                 closest = item;
             }
         }
