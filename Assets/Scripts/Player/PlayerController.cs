@@ -41,6 +41,21 @@ public class PlayerController : NetworkBehaviour
         _characterController = GetComponent<CharacterController>();
     }
 
+    public override void OnStartLocalPlayer()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (cameraHolder != null)
+        {
+            Camera cam = cameraHolder.GetComponentInChildren<Camera>();
+            if (cam != null)
+            {
+                cam.enabled = true;
+            }
+        }
+    }
+
     public void OnMove(InputValue value)
     {
         if (!isLocalPlayer)
@@ -69,6 +84,20 @@ public class PlayerController : NetworkBehaviour
         _sprintHeld = value.isPressed;
     }
 
+    public void OnCursorUnlock(InputValue value)
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        if (value.isPressed)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+    }
+
     private void Update()
     {
         if (!isLocalPlayer)
@@ -76,10 +105,9 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        Debug.Log(_lookInput);
-
         HandleMouseLook();
         HandleMovement();
+        HandleCursorRelock();
     }
 
     private void HandleMouseLook()
@@ -102,5 +130,16 @@ public class PlayerController : NetworkBehaviour
         _verticalVelocity += gravity * Time.deltaTime;
 
         _characterController.Move((moveDir * speed + Vector3.up * _verticalVelocity) * Time.deltaTime);
+    }
+
+    private void HandleCursorRelock()
+    {
+        if (Mouse.current != null
+            && Mouse.current.leftButton.wasPressedThisFrame
+            && Cursor.lockState != CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 }
