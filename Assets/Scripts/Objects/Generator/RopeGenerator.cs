@@ -7,14 +7,22 @@ public class RopeGenerator : NetworkBehaviour
     [SerializeField]
     private int segmentCount = 10;
     [SerializeField]
-    private float segmentLength = 0.2f;
-    [SerializeField]
     private float segmentWidth = 0.05f;
     [SerializeField]
-    private Transform topAnchorPoint;
+    private bool anchorBottomSegment = false;
+    [SerializeField]
+    private float segmentDamping = 3f;
+    [SerializeField]
+    private float jointAngleLimit = 10f;
 
+    private ClimbableObject _climbable;
     private GameObject[] _segments;
     private LineRenderer _lineRenderer;
+
+    private void Awake()
+    {
+        _climbable = GetComponent<ClimbableObject>();
+    }
 
     private void Start()
     {
@@ -33,15 +41,21 @@ public class RopeGenerator : NetworkBehaviour
         Rigidbody prevRb = null;
         NetworkIdentity[] segmentIdentities = new NetworkIdentity[segmentCount];
 
+        Vector3 start = _climbable.TopAnchor.position;
+        Vector3 end = _climbable.BottomAnchor.position;
+        float segmentLength = Vector3.Distance(start, end) / (segmentCount - 1);
+        Vector3 step = (end - start) / (segmentCount - 1);
+
         for (int i = 0; i < segmentCount; i++)
         {
             GameObject segment = new GameObject($"RopeSegment_{i}");
             segment.transform.SetParent(transform);
-            segment.transform.position = topAnchorPoint.position - Vector3.up * (i * segmentLength);
+            segment.transform.position = start + step * i;
 
             Rigidbody rb = segment.AddComponent<Rigidbody>();
             rb.mass = 0.1f;
-            rb.linearDamping = 0.5f;
+            rb.linearDamping = segmentDamping;
+            rb.angularDamping = segmentDamping;
 
             CapsuleCollider col = segment.AddComponent<CapsuleCollider>();
             col.height = segmentLength;
@@ -49,17 +63,18 @@ public class RopeGenerator : NetworkBehaviour
 
             NetworkIdentity netId = segment.AddComponent<NetworkIdentity>();
 
-            if (i == 0)
+            if (i == 0 || (i == segmentCount - 1 && anchorBottomSegment))
             {
                 rb.isKinematic = true;
             }
-            else
+
+            if (i > 0)
             {
                 CharacterJoint joint = segment.AddComponent<CharacterJoint>();
                 joint.enableProjection = true;
                 joint.connectedBody = prevRb;
                 SoftJointLimit limit = new SoftJointLimit();
-                limit.limit = 20f;
+                limit.limit = jointAngleLimit;
                 joint.lowTwistLimit = limit;
                 joint.highTwistLimit = limit;
                 joint.swing1Limit = limit;
