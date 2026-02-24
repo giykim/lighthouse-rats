@@ -46,12 +46,20 @@ public class PlayerController : NetworkBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        GetComponent<PlayerInput>().enabled = true;
+
         if (cameraHolder != null)
         {
-            Camera cam = cameraHolder.GetComponentInChildren<Camera>();
-            if (cam != null)
+            Camera camera = cameraHolder.GetComponentInChildren<Camera>();
+            if (camera != null)
             {
-                cam.enabled = true;
+                camera.enabled = true;
+            }
+
+            AudioListener audioListener = camera.GetComponentInChildren<AudioListener>();
+            if (audioListener != null)
+            {
+                audioListener.enabled = true;
             }
         }
     }
