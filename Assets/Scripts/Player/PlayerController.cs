@@ -119,13 +119,22 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
+        if (_carriedItem == null)
+        {
+            TryPickupItem();
+        }
+    }
+
+    public void OnDrop()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         if (_carriedItem != null)
         {
             DropItem();
-        }
-        else
-        {
-            TryPickupItem();
         }
     }
 
