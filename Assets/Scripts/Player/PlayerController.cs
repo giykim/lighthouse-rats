@@ -32,6 +32,7 @@ public class PlayerController : NetworkBehaviour
 
     private Vector2 _moveInput;
     private Vector2 _lookInput;
+    [SerializeField]
     private bool _sprintHeld;
 
     private Vector3 UP_VECTOR = Vector3.up;
@@ -62,7 +63,6 @@ public class PlayerController : NetworkBehaviour
         {
             return;
         }
-
         _moveInput = value.Get<Vector2>();
     }
 
@@ -74,13 +74,13 @@ public class PlayerController : NetworkBehaviour
 
         _lookInput = value.Get<Vector2>();
     }
-
     public void OnSprint(InputValue value)
     {
-        if (!isLocalPlayer) {
+        if (!isLocalPlayer)
+        {
             return;
         }
-
+        Debug.Log(value.isPressed);
         _sprintHeld = value.isPressed;
     }
 
