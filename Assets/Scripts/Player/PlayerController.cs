@@ -14,6 +14,8 @@ public class PlayerController : NetworkBehaviour
     private float sprintMultiplier = 1.5f;
     [SerializeField]
     private float gravity = -20f;
+    [SerializeField]
+    private float jumpHeight = 1.5f;
 
     [Header("Mouse Look")]
     [SerializeField]
@@ -35,6 +37,7 @@ public class PlayerController : NetworkBehaviour
 
     public Transform ItemHolder => itemHolder;
 
+    private bool _jumpPressed;
     private bool _sprintHeld;
     private CarryableItem _carriedItem;
     private CharacterController _characterController;
@@ -88,6 +91,17 @@ public class PlayerController : NetworkBehaviour
 
         _lookInput = value.Get<Vector2>();
     }
+
+    public void OnJump()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        _jumpPressed = true;
+    }
+
     public void OnSprint(InputValue value)
     {
         if (!isLocalPlayer)
@@ -155,8 +169,20 @@ public class PlayerController : NetworkBehaviour
         Vector3 moveDir = (transform.forward * _moveInput.y + transform.right * _moveInput.x).normalized;
         float speed = _sprintHeld ? sprintMultiplier * moveSpeed : moveSpeed;
 
-        if (_characterController.isGrounded && _verticalVelocity < 0f)
-            _verticalVelocity = -2f;
+        if (_characterController.isGrounded)
+        {
+            if (_verticalVelocity < 0f)
+            {
+                _verticalVelocity = -2f;
+            }
+
+            if (_jumpPressed)
+            {
+                _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            }
+        }
+
+        _jumpPressed = false;
 
         _verticalVelocity += gravity * Time.deltaTime;
 
