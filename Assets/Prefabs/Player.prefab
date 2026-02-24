@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1127012103295581833}
   m_Layer: 0
-  m_Name: ItemHolder
+  m_Name: StorageAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 5385406867585228827}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.527, z: -0.231}
+  m_LocalPosition: {x: 0, y: 0.55, z: -0.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -61,6 +61,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8494641427056474718}
+  m_Father: {fileID: 7290925774710481293}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8553356537984157316
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8098948833307613936}
+  m_Layer: 0
+  m_Name: ItemAnchor
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8098948833307613936
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8553356537984157316}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.3, z: 0.35}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
   m_Father: {fileID: 7290925774710481293}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8732176009012503169
@@ -236,6 +267,7 @@ Transform:
   m_Children:
   - {fileID: 5353244470481242644}
   - {fileID: 4563546453035747866}
+  - {fileID: 8098948833307613936}
   - {fileID: 1127012103295581833}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
@@ -257,11 +289,13 @@ MonoBehaviour:
   moveSpeed: 4
   sprintMultiplier: 1.5
   gravity: -20
+  jumpHeight: 1.5
   cameraHolder: {fileID: 4563546453035747866}
   mouseSensitivity: 1
   verticalLookLimit: 80
   cameraTarget: {fileID: 8494641427056474718}
-  itemHolder: {fileID: 1127012103295581833}
+  itemAnchor: {fileID: 8098948833307613936}
+  storageAnchor: {fileID: 1127012103295581833}
   pickupRadius: 1.2
 --- !u!143 &3591437108752610964
 CharacterController:

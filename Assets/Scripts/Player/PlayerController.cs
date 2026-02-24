@@ -1,8 +1,9 @@
+using Mirror;
+using Mirror.Transports.Encryption;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Mirror;
-using System;
-using Mirror.Transports.Encryption;
+using static CarryableObject;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : NetworkBehaviour
@@ -31,15 +32,19 @@ public class PlayerController : NetworkBehaviour
 
     [Header("Item Carrying")]
     [SerializeField]
-    private Transform itemHolder;
+    private Transform itemAnchor;
+    [SerializeField]
+    private Transform storageAnchor;
     [SerializeField]
     private float pickupRadius = 1.2f;
 
-    public Transform ItemHolder => itemHolder;
+    public Transform ItemAnchor => itemAnchor;
+    public Transform StorageAnchor => storageAnchor;
 
     private bool _jumpPressed;
     private bool _sprintHeld;
     private CarryableObject _carriedObject;
+    private CarryableObject _storedObject;
     private CharacterController _characterController;
     private float _verticalVelocity;
     private float _verticalRotation;
@@ -123,6 +128,16 @@ public class PlayerController : NetworkBehaviour
         {
             TryInteract();
         }
+    }
+
+    public void OnSwap()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
+        CommandSwapItems();
     }
 
     public void OnDrop()
@@ -241,7 +256,7 @@ public class PlayerController : NetworkBehaviour
 
     public void PickupItem(CarryableObject item)
     {
-        if (_carriedObject != null)
+        if (_carriedObject != null && _storedObject != null)
         {
             return;
         }
@@ -259,7 +274,8 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        item.PickedUpBy(netIdentity);
+        ItemSlot slot = _carriedObject == null ? ItemSlot.Carried : ItemSlot.Stored;
+        item.PickedUpBy(netIdentity, slot);
         RpcAttachItem(itemIdentity);
     }
 
@@ -273,10 +289,17 @@ public class PlayerController : NetworkBehaviour
             return;
         }
 
-        _carriedObject = item;
-        item.GetComponent<Rigidbody>().isKinematic = true;
-        item.GetComponent<Rigidbody>().detectCollisions = false;
-        item.transform.SetParent(itemHolder, false);
+        if (_carriedObject == null)
+        {
+            _carriedObject = item;
+            item.transform.SetParent(itemAnchor, false);
+        }
+        else
+        {
+            _storedObject = item;
+            item.transform.SetParent(storageAnchor, false);
+        }
+
         item.transform.localPosition = Vector3.zero;
         item.transform.localRotation = Quaternion.identity;
     }
@@ -320,6 +343,34 @@ public class PlayerController : NetworkBehaviour
         item.transform.SetParent(null);
         item.transform.position = transform.position + transform.forward * 0.6f + Vector3.up * 0.1f;
         _carriedObject = null;
+    }
+
+    [Command]
+    private void CommandSwapItems()
+    {
+        RpcSwapItems();
+    }
+
+    [ClientRpc]
+    private void RpcSwapItems()
+    {
+        CarryableObject temp = _carriedObject;
+        _carriedObject = _storedObject;
+        _storedObject = temp;
+
+        if (_carriedObject != null)
+        {
+            _carriedObject.transform.SetParent(itemAnchor, false);
+            _carriedObject.transform.localPosition = Vector3.zero;
+            _carriedObject.transform.localRotation = Quaternion.identity;
+        }
+
+        if (_storedObject != null)
+        {
+            _storedObject.transform.SetParent(storageAnchor, false);
+            _storedObject.transform.localPosition = Vector3.zero;
+            _storedObject.transform.localRotation = Quaternion.identity;
+        }
     }
 
     private void OnDrawGizmosSelected()

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class CarryableObject : InteractableObject
 {
+    public enum ItemSlot { None, Carried, Stored }
+
     [Header("Item Info")]
     [SerializeField]
     private string itemName = "Item";
@@ -14,6 +16,9 @@ public class CarryableObject : InteractableObject
 
     [SyncVar(hook = nameof(OnCarrierChanged))]
     private NetworkIdentity _carrier;
+
+    [SyncVar]
+    private ItemSlot _slot;
 
     public bool IsCarried => _isCarried;
     public string ItemName => itemName;
@@ -40,10 +45,11 @@ public class CarryableObject : InteractableObject
         return $"Press E to pick up {itemName}";
     }
 
-    public void PickedUpBy(NetworkIdentity carrier)
+    public void PickedUpBy(NetworkIdentity carrier, ItemSlot slot)
     {
         _isCarried = true;
         _carrier = carrier;
+        _slot = slot;
     }
 
     public void Dropped()
@@ -67,7 +73,8 @@ public class CarryableObject : InteractableObject
         {
             _rigidbody.isKinematic = true;
             _rigidbody.detectCollisions = false;
-            transform.SetParent(carrier.ItemHolder, false);
+            Transform anchor = _slot == ItemSlot.Stored ? carrier.StorageAnchor : carrier.ItemAnchor;
+            transform.SetParent(carrier.ItemAnchor, false);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
         }
