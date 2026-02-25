@@ -286,6 +286,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  bodyMesh: {fileID: 5174079422227791015}
   moveSpeed: 4
   pushForce: 3
   sprintMultiplier: 1.5
@@ -297,7 +298,7 @@ MonoBehaviour:
   cameraTarget: {fileID: 8494641427056474718}
   itemAnchor: {fileID: 8098948833307613936}
   storageAnchor: {fileID: 1127012103295581833}
-  pickupRadius: 1.2
+  interactDistance: 1.2
   _currentClimbable: {fileID: 0}
   _isClimbing: 0
 --- !u!143 &3591437108752610964
@@ -463,6 +464,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 3150474306388093854, guid: 9cec72f57b76e9148a39b3bd0fd730e2, type: 3}
+--- !u!1 &5174079422227791015 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6328145177917017561, guid: 9cec72f57b76e9148a39b3bd0fd730e2, type: 3}
+  m_PrefabInstance: {fileID: 1160824041919213950}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5353244470481242644 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6509557623665736554, guid: 9cec72f57b76e9148a39b3bd0fd730e2, type: 3}

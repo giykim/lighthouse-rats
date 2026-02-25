@@ -11,6 +11,10 @@ public class PlayerController : NetworkBehaviour
     public CharacterController CharacterController => _characterController;
     public Vector2 MoveInput => _moveInput;
 
+    [Header("Body")]
+    [SerializeField]
+    private GameObject bodyMesh;
+
     [Header("Movement")]
     [SerializeField]
     private float moveSpeed = 4f;
@@ -41,7 +45,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField]
     private Transform storageAnchor;
     [SerializeField]
-    private float pickupRadius = 1.2f;
+    private float interactDistance = 1.2f;
 
     [Header("Climbing")]
     [SerializeField]
@@ -73,6 +77,10 @@ public class PlayerController : NetworkBehaviour
         Cursor.visible = false;
 
         GetComponent<PlayerInput>().enabled = true;
+
+        Renderer[] bodyRenderers = bodyMesh.GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in bodyRenderers)
+            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
 
         if (cameraHolder != null)
         {
@@ -285,31 +293,19 @@ public class PlayerController : NetworkBehaviour
 
     private void TryInteract()
     {
-        Collider[] hits = Physics.OverlapSphere(transform.position, pickupRadius);
+        Ray ray = new Ray(cameraHolder.position, cameraHolder.forward);
 
-        InteractableObject closest = null;
-        float shortestDistance = float.MaxValue;
-
-        foreach (Collider collider in hits)
+        if (Physics.Raycast(ray, out RaycastHit hit, interactDistance))
         {
-            InteractableObject item = collider.GetComponentInParent<InteractableObject>();
+            Debug.Log(hit.collider.gameObject);
+            InteractableObject item = hit.collider.GetComponentInParent<InteractableObject>();
 
             if (item == null || item is CarryableObject carryable && carryable.IsCarried)
             {
-                continue;
+                return;
             }
 
-            float distance = Vector3.Distance(transform.position, collider.transform.position);
-
-            if (distance < shortestDistance) {
-                shortestDistance = distance;
-                closest = item;
-            }
-        }
-
-        if (closest != null)
-        {
-            closest.OnInteract(this);
+            item.OnInteract(this);
         }
     }
 
@@ -442,11 +438,5 @@ public class PlayerController : NetworkBehaviour
 
         Vector3 pushDir = new Vector3(hit.moveDirection.x, 0f, hit.moveDirection.z);
         rb.AddForce(pushDir * pushForce, ForceMode.Force);
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, pickupRadius);
     }
 }
