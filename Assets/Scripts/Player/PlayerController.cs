@@ -45,7 +45,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField]
     private Transform storageAnchor;
     [SerializeField]
-    private float interactDistance = 1.2f;
+    private float interactDistance = 2.5f;
 
     [Header("Climbing")]
     [SerializeField]
@@ -297,7 +297,6 @@ public class PlayerController : NetworkBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, interactDistance))
         {
-            Debug.Log(hit.collider.gameObject);
             InteractableObject item = hit.collider.GetComponentInParent<InteractableObject>();
 
             if (item == null || item is CarryableObject carryable && carryable.IsCarried)

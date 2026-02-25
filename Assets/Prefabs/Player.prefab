@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 456041727124920200}
   - component: {fileID: 6379071055173567779}
   - component: {fileID: -2379945080064438462}
+  - component: {fileID: 5859168611900433862}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -298,7 +299,7 @@ MonoBehaviour:
   cameraTarget: {fileID: 8494641427056474718}
   itemAnchor: {fileID: 8098948833307613936}
   storageAnchor: {fileID: 1127012103295581833}
-  interactDistance: 1.2
+  interactDistance: 2.5
   _currentClimbable: {fileID: 0}
   _isClimbing: 0
 --- !u!143 &3591437108752610964
@@ -407,6 +408,21 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &5859168611900433862
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9191299058351913663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c7bc28b350c6cc48964ee0c78d606fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHUD
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
 --- !u!1001 &1160824041919213950
 PrefabInstance:
   m_ObjectHideFlags: 0
