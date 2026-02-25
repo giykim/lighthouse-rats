@@ -5,6 +5,8 @@ public class RopeGenerator : NetworkBehaviour
 {
     [Header("Rope Settings")]
     [SerializeField]
+    private Material ropeMaterial;
+    [SerializeField]
     private int segmentCount = 10;
     [SerializeField]
     private float segmentWidth = 0.05f;
@@ -107,7 +109,7 @@ public class RopeGenerator : NetworkBehaviour
         _lineRenderer.startWidth = segmentWidth;
         _lineRenderer.endWidth = segmentWidth;
         _lineRenderer.positionCount = segmentCount;
-        _lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        _lineRenderer.material = ropeMaterial != null ? ropeMaterial : new Material(Shader.Find("Sprites/Default"));
         _lineRenderer.startColor = new Color(0.6f, 0.4f, 0.2f);
         _lineRenderer.endColor = new Color(0.6f, 0.4f, 0.2f);
     }
