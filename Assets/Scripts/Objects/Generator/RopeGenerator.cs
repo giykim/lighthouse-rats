@@ -5,6 +5,8 @@ public class RopeGenerator : NetworkBehaviour
 {
     [Header("Rope Settings")]
     [SerializeField]
+    private GameObject ropeSegmentPrefab;
+    [SerializeField]
     private Material ropeMaterial;
     [SerializeField]
     private int segmentCount = 10;
@@ -41,7 +43,6 @@ public class RopeGenerator : NetworkBehaviour
     {
         _segments = new GameObject[segmentCount];
         Rigidbody prevRb = null;
-        NetworkIdentity[] segmentIdentities = new NetworkIdentity[segmentCount];
 
         Vector3 start = _climbable.TopAnchor.position;
         Vector3 end = _climbable.BottomAnchor.position;
@@ -50,9 +51,9 @@ public class RopeGenerator : NetworkBehaviour
 
         for (int i = 0; i < segmentCount; i++)
         {
-            GameObject segment = new GameObject($"RopeSegment_{i}");
+            GameObject segment = Instantiate(ropeSegmentPrefab, start + step * i, Quaternion.identity);
+            segment.name = $"RopeSegment_{i}";
             segment.transform.SetParent(transform);
-            segment.transform.position = start + step * i;
 
             Rigidbody rb = segment.AddComponent<Rigidbody>();
             rb.mass = 0.1f;
@@ -62,8 +63,6 @@ public class RopeGenerator : NetworkBehaviour
             CapsuleCollider col = segment.AddComponent<CapsuleCollider>();
             col.height = segmentLength;
             col.radius = segmentWidth;
-
-            NetworkIdentity netId = segment.AddComponent<NetworkIdentity>();
 
             if (i == 0 || (i == segmentCount - 1 && anchorBottomSegment))
             {
@@ -86,21 +85,13 @@ public class RopeGenerator : NetworkBehaviour
             _segments[i] = segment;
             prevRb = rb;
             NetworkServer.Spawn(segment);
-            segmentIdentities[i] = netId;
         }
-
-        RpcReceiveSegments(segmentIdentities);
     }
 
-    [ClientRpc]
-    private void RpcReceiveSegments(NetworkIdentity[] segmentIdentities)
+    public override void OnStartClient()
     {
-        _segments = new GameObject[segmentIdentities.Length];
-        for (int i = 0; i < segmentIdentities.Length; i++)
-        {
-            if (segmentIdentities[i] != null)
-                _segments[i] = segmentIdentities[i].gameObject;
-        }
+        if (!isServer)
+            _segments = new GameObject[segmentCount];
     }
 
     private void SetupLineRenderer()
@@ -116,17 +107,18 @@ public class RopeGenerator : NetworkBehaviour
 
     private void Update()
     {
-        if (_segments == null)
-        {
-            return;
-        }
+        if (_segments == null) return;
 
         for (int i = 0; i < _segments.Length; i++)
         {
-            if (_segments[i] != null)
+            if (_segments[i] == null)
             {
-                _lineRenderer.SetPosition(i, _segments[i].transform.position);
+                Transform t = transform.Find($"RopeSegment_{i}");
+                if (t != null) _segments[i] = t.gameObject;
             }
+
+            if (_segments[i] != null)
+                _lineRenderer.SetPosition(i, _segments[i].transform.position);
         }
     }
 
