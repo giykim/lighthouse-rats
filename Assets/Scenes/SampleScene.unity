@@ -440,7 +440,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &543564421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -511,7 +511,8 @@ MonoBehaviour:
   playerPrefab: {fileID: 9191299058351913663, guid: d932484fc6bfc704e92d5ac6b047603e, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 5053012106591288847, guid: 68aceedeb3c90e347acb545ff09cb939, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2
@@ -1317,7 +1318,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1791041493
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1347,7 +1348,8 @@ MonoBehaviour:
   playerPrefab: {fileID: 9191299058351913663, guid: d932484fc6bfc704e92d5ac6b047603e, type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 5053012106591288847, guid: 68aceedeb3c90e347acb545ff09cb939, type: 3}
   exceptionsDisconnect: 1
   snapshotSettings:
     bufferTimeMultiplier: 2

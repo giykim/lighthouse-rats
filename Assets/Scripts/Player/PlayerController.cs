@@ -194,6 +194,11 @@ public class PlayerController : NetworkBehaviour
         _isClimbing = true;
         _currentClimbable = climbable;
         _verticalVelocity = 0f;
+
+        if (!isServer && climbable is Rope rope)
+        {
+            CommandSetRopeCollisionsIgnored(rope.netIdentity, true);
+        }
     }
 
     public void StopClimbing()
@@ -201,11 +206,33 @@ public class PlayerController : NetworkBehaviour
         if (_currentClimbable is Rope rope)
         {
             rope.SetSegmentCollisionsIgnored(_characterController, false);
+            if (!isServer)
+            {
+                CommandSetRopeCollisionsIgnored(rope.netIdentity, false);
+            }
         }
 
         _isClimbing = false;
         _currentClimbable = null;
         _verticalVelocity = 0f;
+    }
+
+    [Command]
+    private void CommandSetRopeCollisionsIgnored(NetworkIdentity ropeIdentity, bool ignore)
+    {
+        Rope rope = ropeIdentity.GetComponent<Rope>();
+        if (rope != null)
+        {
+            rope.SetSegmentCollisionsIgnored(_characterController, ignore);
+        }
+    }
+
+    [Command]
+    public void CommandApplyForceToSegment(NetworkIdentity segmentIdentity, Vector3 force)
+    {
+        Rigidbody rigidbody = segmentIdentity.GetComponent<Rigidbody>();
+        if (rigidbody != null && !rigidbody.isKinematic)
+            rigidbody.AddForce(force, ForceMode.Force);
     }
 
     private void Update()
@@ -429,13 +456,28 @@ public class PlayerController : NetworkBehaviour
 
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
-        Rigidbody rb = hit.collider.attachedRigidbody;
-        if (rb == null || rb.isKinematic || hit.moveDirection.y < -0.3f)
+        Rigidbody rigidbody = hit.collider.attachedRigidbody;
+
+        if (rigidbody == null)
+        {
+            if (isLocalPlayer && !isServer && hit.moveDirection.y >= -0.3f)
+            {
+                NetworkIdentity netId = hit.collider.GetComponentInParent<NetworkIdentity>();
+                if (netId != null)
+                {
+                    Vector3 pushDir = new Vector3(hit.moveDirection.x, 0f, hit.moveDirection.z);
+                    CommandApplyForceToSegment(netId, pushDir * pushForce);
+                }
+            }
+            return;
+        }
+
+        if (rigidbody.isKinematic || hit.moveDirection.y < -0.3f)
         {
             return;
         }
 
-        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0f, hit.moveDirection.z);
-        rb.AddForce(pushDir * pushForce, ForceMode.Force);
+        Vector3 dir = new Vector3(hit.moveDirection.x, 0f, hit.moveDirection.z);
+        rigidbody.AddForce(dir * pushForce, ForceMode.Force);
     }
 }

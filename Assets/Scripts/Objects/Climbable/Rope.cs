@@ -1,4 +1,5 @@
 using UnityEngine;
+using Mirror;
 
 [RequireComponent(typeof(RopeGenerator))]
 public class Rope : ClimbableObject
@@ -42,7 +43,22 @@ public class Rope : ClimbableObject
         GameObject closestSegment = segments[closestIndex];
         Vector3 segmentPos = closestSegment.transform.position;
 
-        closestSegment.GetComponent<Rigidbody>()?.AddForce(player.transform.forward * 0.5f, ForceMode.Force);
+        if (isServer)
+        {
+            Rigidbody rb = closestSegment.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.AddForce(player.transform.forward * 0.5f, ForceMode.Force);
+            }
+        }
+        else
+        {
+            NetworkIdentity netId = closestSegment.GetComponent<NetworkIdentity>();
+            if (netId != null)
+            {
+                player.CommandApplyForceToSegment(netId, player.transform.forward * 0.5f);
+            }
+        }
 
         Vector3 ropeAxis = (topAnchor != null && bottomAnchor != null)
             ? (bottomAnchor.position - topAnchor.position).normalized

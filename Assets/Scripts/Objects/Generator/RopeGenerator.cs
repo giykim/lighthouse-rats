@@ -1,3 +1,4 @@
+using System.Collections;
 using Mirror;
 using UnityEngine;
 
@@ -18,6 +19,8 @@ public class RopeGenerator : NetworkBehaviour
     private float segmentDamping = 3f;
     [SerializeField]
     private float jointAngleLimit = 10f;
+
+    private readonly SyncList<uint> _segmentNetIds = new SyncList<uint>();
 
     private ClimbableObject _climbable;
     private GameObject[] _segments;
@@ -85,13 +88,37 @@ public class RopeGenerator : NetworkBehaviour
             _segments[i] = segment;
             prevRb = rb;
             NetworkServer.Spawn(segment);
+            _segmentNetIds.Add(segment.GetComponent<NetworkIdentity>().netId);
         }
     }
 
     public override void OnStartClient()
     {
         if (!isServer)
+        {
             _segments = new GameObject[segmentCount];
+            StartCoroutine(ParentSegmentsWhenReady());
+        }
+    }
+
+    private IEnumerator ParentSegmentsWhenReady()
+    {
+        float segmentLength = Vector3.Distance(_climbable.TopAnchor.position, _climbable.BottomAnchor.position) / (segmentCount - 1);
+
+        for (int i = 0; i < segmentCount; i++)
+        {
+            while (i >= _segmentNetIds.Count || !NetworkClient.spawned.ContainsKey(_segmentNetIds[i]))
+                yield return null;
+
+            NetworkIdentity identity = NetworkClient.spawned[_segmentNetIds[i]];
+            identity.transform.SetParent(transform);
+            identity.name = $"RopeSegment_{i}";
+            _segments[i] = identity.gameObject;
+
+            CapsuleCollider col = identity.gameObject.AddComponent<CapsuleCollider>();
+            col.height = segmentLength;
+            col.radius = segmentWidth;
+        }
     }
 
     private void SetupLineRenderer()
@@ -111,12 +138,6 @@ public class RopeGenerator : NetworkBehaviour
 
         for (int i = 0; i < _segments.Length; i++)
         {
-            if (_segments[i] == null)
-            {
-                Transform t = transform.Find($"RopeSegment_{i}");
-                if (t != null) _segments[i] = t.gameObject;
-            }
-
             if (_segments[i] != null)
                 _lineRenderer.SetPosition(i, _segments[i].transform.position);
         }
