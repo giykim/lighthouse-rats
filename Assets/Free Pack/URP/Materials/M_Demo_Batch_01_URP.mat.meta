@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e8c470ca25a4f294697086daddb62a0f
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 327318
+  packageName: RBP Asset Showcase
+  packageVersion: 1.0.0
+  assetPath: Assets/Free Pack/URP/Materials/M_Demo_Batch_01_URP.mat
+  uploadId: 775314

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: a30ea3dc2c9268046bf9c045b729783e
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 327318
+  packageName: RBP Asset Showcase
+  packageVersion: 1.0.0
+  assetPath: Assets/Free Pack/URP/Materials/M_Apple_V4_URP.mat
+  uploadId: 775314

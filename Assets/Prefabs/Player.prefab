@@ -292,7 +292,7 @@ MonoBehaviour:
   pushForce: 3
   sprintMultiplier: 1.5
   gravity: -20
-  jumpHeight: 1.5
+  jumpHeight: 2.5
   cameraHolder: {fileID: 4563546453035747866}
   mouseSensitivity: 1
   verticalLookLimit: 80

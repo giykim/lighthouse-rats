@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: adff1c55abf178d45956d833de19a4c9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 327318
+  packageName: RBP Asset Showcase
+  packageVersion: 1.0.0
+  assetPath: Assets/Free Pack/Built-In/Materials/M_CerealBox.mat
+  uploadId: 775314

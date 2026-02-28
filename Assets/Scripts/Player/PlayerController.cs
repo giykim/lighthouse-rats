@@ -58,6 +58,7 @@ public class PlayerController : NetworkBehaviour
 
     private bool _jumpPressed;
     private bool _sprintHeld;
+    private bool _isDragging;
     private CarryableObject _carriedObject;
     private CarryableObject _storedObject;
     private CharacterController _characterController;
@@ -175,6 +176,11 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    public void SetDragging(bool dragging)
+    {
+        _isDragging = dragging;
+    }
+
     public void OnCursorUnlock(InputValue value)
     {
         if (!isLocalPlayer)
@@ -268,6 +274,10 @@ public class PlayerController : NetworkBehaviour
     {
         Vector3 moveDir = (transform.forward * _moveInput.y + transform.right * _moveInput.x).normalized;
         float speed = _sprintHeld ? sprintMultiplier * moveSpeed : moveSpeed;
+        if (_isDragging) //Reduce speed when pushing/dragging an object
+        {
+            speed *= 0.4f; 
+        }
 
         if (_characterController.isGrounded)
         {
