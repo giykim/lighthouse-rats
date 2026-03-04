@@ -27,6 +27,8 @@ public class NPCAI : NetworkBehaviour
     private float detectionDecayTime = 5f;
     [SerializeField]
     private float eventStateDuration = 15f;
+    [SerializeField]
+    private float eyeHeight = 1.6f;
 
     [Header("Speed")]
     [SerializeField]
@@ -88,6 +90,14 @@ public class NPCAI : NetworkBehaviour
                           Vector3.Angle(transform.forward, (p.position - transform.position).normalized) < detectionAngle / 2f;
 
             if (!inSphere && !inCone)
+            {
+                continue;
+            }
+
+            Vector3 eye = transform.position + Vector3.up * eyeHeight;
+            Vector3 toPlayer = p.position - eye;
+            if (Physics.Raycast(eye, toPlayer.normalized, out RaycastHit hit, toPlayer.magnitude)
+                && hit.transform.root != p.root && hit.transform.root != transform.root)
             {
                 continue;
             }
@@ -285,6 +295,18 @@ public class NPCAI : NetworkBehaviour
         Gizmos.color = Color.Lerp(Color.white, Color.red, _detectionProgress);
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
         DrawDetectionCone(coneDistance);
+
+        Vector3 eye = transform.position + Vector3.up * eyeHeight;
+        Gizmos.DrawSphere(eye, 0.08f);
+
+        foreach (var p in PlayerRegistry.All)
+        {
+            Vector3 toPlayer = p.position - eye;
+            bool blocked = Physics.Raycast(eye, toPlayer.normalized, out RaycastHit losHit, toPlayer.magnitude)
+                           && losHit.transform.root != p.root && losHit.transform.root != transform.root;
+            Gizmos.color = blocked ? Color.magenta : Color.yellow;
+            Gizmos.DrawLine(eye, p.position);
+        }
 
         if (_target != null)
         {

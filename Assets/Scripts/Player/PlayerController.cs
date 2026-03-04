@@ -276,6 +276,10 @@ public class PlayerController : NetworkBehaviour
     {
         Vector3 moveDir = (transform.forward * _moveInput.y + transform.right * _moveInput.x).normalized;
         float speed = _sprintHeld ? sprintMultiplier * moveSpeed : moveSpeed;
+        if (DebugService.PlayerSuperspeed)
+        {
+            speed *= 5f;
+        }
         if (_isDragging) //Reduce speed when pushing/dragging an object
         {
             speed *= 0.4f; 
