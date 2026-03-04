@@ -15,7 +15,9 @@ public class TalkableNPC : InteractableObject
     private float secondsPerLine = 3f;
 
     private Coroutine _dialogueCoroutine;
-    
+    private bool _dialogueActive;
+    private Transform _talkingTo;
+
     private int _activeEntryIndex = -1;
     private int _phaseIndex;
 
@@ -28,16 +30,18 @@ public class TalkableNPC : InteractableObject
 
     public override void OnInteract(PlayerController player)
     {
-        CommandStartDialogue();
+        CommandStartDialogue(player.netIdentity);
     }
 
     [Command(requiresAuthority = false)]
-    private void CommandStartDialogue()
+    private void CommandStartDialogue(NetworkIdentity playerIdentity)
     {
-        if (dialogue == null)
+        if (_dialogueActive || dialogue == null)
         {
             return;
         }
+
+        _talkingTo = playerIdentity.transform;
 
         int entryIndex = dialogue.GetActiveEntryIndex();
         if (entryIndex == -1)
@@ -52,12 +56,15 @@ public class TalkableNPC : InteractableObject
         }
 
         DialogueEntry entry = dialogue.entries[entryIndex];
-        if (entry.phases == null || entry.phases.Length == 0) return;
+        if (entry.phases == null || entry.phases.Length == 0)
+        {
+            return;
+        }
 
         string[] lines = entry.phases[_phaseIndex].lines;
-        
         _phaseIndex = Mathf.Min(_phaseIndex + 1, entry.phases.Length - 1);
 
+        _dialogueActive = true;
         RpcShowDialogue(lines);
     }
 
@@ -83,6 +90,23 @@ public class TalkableNPC : InteractableObject
         dialogueBubble.SetActive(false);
         dialogueText.text = string.Empty;
         _dialogueCoroutine = null;
+        _dialogueActive = false;
+        _talkingTo = null;
+    }
+
+    private void Update()
+    {
+        if (!isServer || !_dialogueActive || _talkingTo == null)
+        {
+            return;
+        }
+
+        Vector3 dir = _talkingTo.position - transform.position;
+        dir.y = 0f;
+        if (dir != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(dir);
+        }
     }
 
     private void LateUpdate()
@@ -94,7 +118,7 @@ public class TalkableNPC : InteractableObject
 
         if (Camera.main != null)
         {
-            dialogueBubble.transform.forward = Camera.main.transform.forward;
+            dialogueBubble.transform.forward = dialogueBubble.transform.position - Camera.main.transform.position;
         }
     }
 }
