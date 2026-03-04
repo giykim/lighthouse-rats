@@ -1,0 +1,35 @@
+{
+    "entries": [
+        {
+            "requiredEvents": [],
+            "phases": [
+                {
+                    "lines": [
+                        "AHHHHHHH",
+                        "HOW'D YOU GET IN HERE",
+                        "Huh? Duf is worried about Ham?",
+                        "Who's Ham?"
+                    ]
+                },
+                {
+                    "lines": [
+                        "Okay fine, I am Ham, but don't tell him where I am.",
+                        "Just let him know I'm alive.",
+                        "I'm tired of working on projects for the rat society. I just want to rest."
+                    ],
+                    "triggerEvent": "found_ham"
+                },
+                {
+                    "lines": [
+                        "Actually, I have been running out of supplies around here... Could you get me a cigarette?"
+                    ]
+                },
+                {
+                    "lines": [
+                        "A cigarette would be real nice right now..."
+                    ]
+                }
+            ]
+        }
+    ]
+}

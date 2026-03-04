@@ -8,6 +8,7 @@ public class GameProgress : NetworkBehaviour
     private readonly SyncList<string> _completedEvents = new();
 
     public static event Action<string> OnEventCompleted;
+    public static event Action<string> OnServerEventCompleted;
 
     private void Awake()
     {
@@ -30,6 +31,7 @@ public class GameProgress : NetworkBehaviour
         if (!_completedEvents.Contains(eventKey))
         {
             _completedEvents.Add(eventKey);
+            OnServerEventCompleted?.Invoke(eventKey);
         }
     }
     

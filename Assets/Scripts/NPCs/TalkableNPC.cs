@@ -1,12 +1,15 @@
 using Mirror;
 using System.Collections;
+using System.IO;
 using TMPro;
 using UnityEngine;
 
 public class TalkableNPC : InteractableObject
 {
     [SerializeField]
-    private NPCDialogue dialogue;
+    private string dialogueFile;
+
+    private NPCDialogueData _dialogue;
     [SerializeField]
     private TextMeshPro dialogueText;
     [SerializeField]
@@ -26,6 +29,21 @@ public class TalkableNPC : InteractableObject
         dialogueBubble.SetActive(false);
     }
 
+    public override void OnStartServer()
+    {
+        if (string.IsNullOrEmpty(dialogueFile))
+            return;
+
+        string path = Path.Combine(Application.streamingAssetsPath, "Dialogue", dialogueFile + ".json");
+        if (!File.Exists(path))
+        {
+            Debug.LogWarning($"[TalkableNPC] Dialogue file not found: {path}");
+            return;
+        }
+
+        _dialogue = JsonUtility.FromJson<NPCDialogueData>(File.ReadAllText(path));
+    }
+
     public override string GetPromptText() => "Press E to talk";
 
     public override void OnInteract(PlayerController player)
@@ -36,14 +54,14 @@ public class TalkableNPC : InteractableObject
     [Command(requiresAuthority = false)]
     private void CommandStartDialogue(NetworkIdentity playerIdentity)
     {
-        if (_dialogueActive || dialogue == null)
+        if (_dialogueActive || _dialogue == null)
         {
             return;
         }
 
         _talkingTo = playerIdentity.transform;
 
-        int entryIndex = dialogue.GetActiveEntryIndex();
+        int entryIndex = _dialogue.GetActiveEntryIndex();
         if (entryIndex == -1)
         {
             return;
@@ -55,14 +73,19 @@ public class TalkableNPC : InteractableObject
             _phaseIndex = 0;
         }
 
-        DialogueEntry entry = dialogue.entries[entryIndex];
+        DialogueEntry entry = _dialogue.entries[entryIndex];
         if (entry.phases == null || entry.phases.Length == 0)
         {
             return;
         }
 
-        string[] lines = entry.phases[_phaseIndex].lines;
+        DialoguePhase phase = entry.phases[_phaseIndex];
         _phaseIndex = Mathf.Min(_phaseIndex + 1, entry.phases.Length - 1);
+
+        if (!string.IsNullOrEmpty(phase.triggerEvent))
+            GameProgress.Instance.Complete(phase.triggerEvent);
+
+        string[] lines = phase.lines;
 
         _dialogueActive = true;
         RpcShowDialogue(lines);
@@ -85,7 +108,7 @@ public class TalkableNPC : InteractableObject
         foreach (var line in lines)
         {
             dialogueText.text = line;
-            yield return new WaitForSeconds(secondsPerLine);
+            yield return new WaitForSeconds(secondsPerLine / (DebugService.FastDialogue ? 5f : 1f));
         }
         dialogueBubble.SetActive(false);
         dialogueText.text = string.Empty;

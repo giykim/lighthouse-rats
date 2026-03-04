@@ -78,7 +78,7 @@ public class Door : ToggleableObject
     {
         if (_isLocked)
         {
-            return $"Requires {keyName}";
+            return $"Requires a key";
         }
 
         return IsToggled ? "Press E to close" : "Press E to open";

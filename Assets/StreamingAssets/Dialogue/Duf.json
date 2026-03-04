@@ -1,0 +1,67 @@
+{
+    "entries": [
+        {
+            "requiredEvents": ["found_ham"],
+            "phases": [
+                {
+                    "lines": [
+                        "What'd you say?",
+                        "Ham is safe?",
+                        "That's amazing!"
+                    ]
+                },
+                {
+                    "lines": [
+                        "Where is he?",
+                        "Huh? What do you mean you don't know?",
+                        "Erm... okay I guess."
+                    ]
+                },
+                {
+                    "lines": [
+                        "Well, I guess I can go back to building things now!",
+                        "Say, how about I make you a car, so that you can go visit Ham more often for me?",
+                        "I'm going to need 3 pieces of scrap metal."
+                    ]
+                },
+                {
+                    "lines": [
+                        "Bring me more scrap metal, and let's build this car!"
+                    ]
+                }
+            ]
+        },
+        {
+            "requiredEvents": [],
+            "phases": [
+                {
+                    "lines": [
+                        "Hey, I'm Duf!",
+                        "I used to love tinkering with things, but...",
+                        "My brother Ham's been missing and I'm worried sick."
+                    ]
+                },
+                {
+                    "lines": [
+                        "Ham and I used to be called the engineers of the rat society.",
+                        "I loved working on engines, and he loved tinkering with gears!",
+                        "But now he's gone, and I don't even know where he would have gone off to...",
+                        "Especially given he's become very lazy...",
+                        "Can you help me find him?"
+                    ]
+                },
+                {
+                    "lines": [
+                        "This key is the last thing I have of his. Maybe it'll help you find him."
+                    ],
+                    "triggerEvent": "look_for_ham"
+                },
+                {
+                    "lines": [
+                        "Ham used to love tinkering with gears..."
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -199,8 +199,6 @@ public class NPCAI : NetworkBehaviour
             }
         }
 
-        Debug.Log(_state);
-
         switch (_state)
         {
             case NPCState.Idle:

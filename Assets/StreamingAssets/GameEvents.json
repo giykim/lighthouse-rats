@@ -1,0 +1,9 @@
+{
+    "spawnBindings": [
+        {
+            "eventKey": "look_for_ham",
+            "prefabName": "Ham's Key",
+            "spawnPointName": "Ham's Key Spawnpoint"
+        }
+    ]
+}

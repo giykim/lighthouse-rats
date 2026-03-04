@@ -5,8 +5,8 @@ using UnityEngine;
 [Serializable]
 public class DialoguePhase
 {
-    [TextArea]
     public string[] lines;
+    public string triggerEvent;
 }
 
 [Serializable]
@@ -16,8 +16,8 @@ public class DialogueEntry
     public DialoguePhase[] phases;
 }
 
-[CreateAssetMenu(fileName = "NPCDialogue", menuName = "NPCs/Dialogue")]
-public class NPCDialogue : ScriptableObject
+[Serializable]
+public class NPCDialogueData
 {
     public List<DialogueEntry> entries = new();
 
@@ -31,7 +31,7 @@ public class NPCDialogue : ScriptableObject
         for (int i = 0; i < entries.Count; i++)
         {
             bool conditionsMet = true;
-            foreach (var required in entries[i].requiredEvents)
+            foreach (var required in entries[i].requiredEvents ?? Array.Empty<string>())
             {
                 if (!GameProgress.Instance.Has(required))
                 {
