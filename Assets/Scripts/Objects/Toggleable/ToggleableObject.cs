@@ -20,6 +20,12 @@ public abstract class ToggleableObject : InteractableObject
     [Command(requiresAuthority = false)]
     private void CommandToggle()
     {
+        ServerPerformToggle();
+    }
+
+    [Server]
+    protected void ServerPerformToggle()
+    {
         _isToggled = !_isToggled;
     }
 

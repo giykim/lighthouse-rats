@@ -8,8 +8,12 @@ public class Door : ToggleableObject
     private float openAngle = 90f;
     [SerializeField]
     private float openSpeed = 3f;
+
+    [Header("Key")]
     [SerializeField]
-    private bool lockedByDefault = false;
+    private bool requiresKey = false;
+    [SerializeField]
+    private string keyName = "Key";
 
     [SyncVar(hook = nameof(OnIsLockedChanged))]
     private bool _isLocked = false;
@@ -23,7 +27,41 @@ public class Door : ToggleableObject
         _closedRotation = transform.localRotation;
         _openRotation = Quaternion.Euler(
             transform.localEulerAngles + new Vector3(0f, openAngle, 0f));
-        _isLocked = lockedByDefault;
+        _isLocked = requiresKey;
+    }
+
+    public override void OnInteract(PlayerController player)
+    {
+        if (requiresKey && _isLocked)
+        {
+            CommandTryUnlockWithKey(player.netIdentity);
+            return;
+        }
+
+        base.OnInteract(player);
+    }
+
+    [Command(requiresAuthority = false)]
+    private void CommandTryUnlockWithKey(NetworkIdentity playerIdentity)
+    {
+        CarryableObject key = null;
+        foreach (var obj in FindObjectsByType<CarryableObject>(FindObjectsSortMode.None))
+        {
+            if (obj.Carrier == playerIdentity && obj.ItemName == keyName)
+            {
+                key = obj;
+                break;
+            }
+        }
+
+        if (key == null)
+        {
+            return;
+        }
+
+        NetworkServer.Destroy(key.gameObject);
+        _isLocked = false;
+        ServerPerformToggle();
     }
 
     protected override bool CanToggle(PlayerController player)
@@ -40,7 +78,7 @@ public class Door : ToggleableObject
     {
         if (_isLocked)
         {
-            return "Locked";
+            return $"Requires {keyName}";
         }
 
         return IsToggled ? "Press E to close" : "Press E to open";

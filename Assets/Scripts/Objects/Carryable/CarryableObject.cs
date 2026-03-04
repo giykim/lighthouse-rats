@@ -22,6 +22,7 @@ public class CarryableObject : InteractableObject
     private ItemSlot _slot;
 
     public bool IsCarried => _isCarried;
+    public NetworkIdentity Carrier => _carrier;
     public string ItemName => itemName;
     public Sprite ItemIcon => itemIcon;
 

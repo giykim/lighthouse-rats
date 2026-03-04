@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d691644aa162fb40b8d6942da9d145c, type: 3}
+  m_Name: HamDialogue
+  m_EditorClassIdentifier: Assembly-CSharp::NPCDialogue
+  entries:
+  - requiredEvents: []
+    phases:
+    - lines:
+      - AHHHH
+      - HOW'D YOU GET IN HERE
+    - lines:
+      - Huh? Duf is worried about me?
+      - Well, tell him I'm alive but not where I am.
+      - I'm tired of working on projects for the rat society. I just want to rest.
+    - lines:
+      - Actually, I have been running out of supplies around here... Could you get
+        me a cigarette?
+    - lines:
+      - I cigarette would be real nice right now...

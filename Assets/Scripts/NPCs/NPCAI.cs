@@ -148,7 +148,7 @@ public class NPCAI : NetworkBehaviour
         if (found != null)
         {
             float proximity = 1f - Mathf.Clamp01(foundDist / foundMaxDist);
-            float rate = Mathf.Lerp(1f, 3f, proximity * proximity) / detectionBuildTime;
+            float rate = Mathf.Lerp(1f, 5f, proximity) / detectionBuildTime;
             _detectionProgress = Mathf.Min(1f, _detectionProgress + rate * Time.deltaTime);
 
             if (_detectionProgress >= 1f)
@@ -198,6 +198,8 @@ public class NPCAI : NetworkBehaviour
                 _state = entry != null ? BehaviorToState(entry.behavior) : NPCState.Idle;
             }
         }
+
+        Debug.Log(_state);
 
         switch (_state)
         {
