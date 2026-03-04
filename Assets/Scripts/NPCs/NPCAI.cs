@@ -36,6 +36,10 @@ public class NPCAI : NetworkBehaviour
     [SerializeField]
     private float chaseSpeed = 4f;
 
+    [Header("Attack")]
+    [SerializeField]
+    private float attackRange = 1.5f;
+
     [SyncVar]
     private NPCState _state = NPCState.Idle;
 
@@ -55,6 +59,14 @@ public class NPCAI : NetworkBehaviour
     private void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
+    }
+
+    public override void OnStartClient()
+    {
+        if (!isServer)
+        {
+            _agent.enabled = false;
+        }
     }
 
     private void Update()
@@ -266,6 +278,15 @@ public class NPCAI : NetworkBehaviour
 
         _agent.speed = chaseSpeed;
         _agent.SetDestination(_target.position);
+
+        if ((_target.position - transform.position).sqrMagnitude <= attackRange * attackRange)
+        {
+            PlayerHealth health = _target.GetComponent<PlayerHealth>();
+            if (health != null && health.IsAlive)
+            {
+                health.Die();
+            }
+        }
     }
 
     private void ExecuteInvestigate()
@@ -292,6 +313,9 @@ public class NPCAI : NetworkBehaviour
 
     private void DrawGizmos()
     {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
         Gizmos.color = Color.Lerp(Color.white, Color.red, _detectionProgress);
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
         DrawDetectionCone(coneDistance);
