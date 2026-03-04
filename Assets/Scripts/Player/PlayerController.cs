@@ -263,9 +263,11 @@ public class PlayerController : NetworkBehaviour
 
     private void HandleMouseLook()
     {
-        transform.Rotate(Vector3.up * _lookInput.x * mouseSensitivity);
+        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
 
-        _verticalRotation -= _lookInput.y * mouseSensitivity;
+        transform.Rotate(Vector3.up * mouseDelta.x * mouseSensitivity);
+
+        _verticalRotation -= mouseDelta.y * mouseSensitivity;
         _verticalRotation = Mathf.Clamp(_verticalRotation, -verticalLookLimit, verticalLookLimit);
         cameraHolder.localRotation = Quaternion.Euler(_verticalRotation, 0f, 0f);
     }
