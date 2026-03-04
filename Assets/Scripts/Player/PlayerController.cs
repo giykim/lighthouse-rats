@@ -334,21 +334,23 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    private void TryInteract()
+    public InteractableObject GetLookedAtInteractable()
     {
         Ray ray = new Ray(cameraHolder.position, cameraHolder.forward);
-
         if (Physics.Raycast(ray, out RaycastHit hit, interactDistance))
         {
             InteractableObject item = hit.collider.GetComponentInParent<InteractableObject>();
-
-            if (item == null || item is CarryableObject carryable && carryable.IsCarried)
-            {
-                return;
-            }
-
-            item.OnInteract(this);
+            if (item != null && !(item is CarryableObject c && c.IsCarried))
+                return item;
         }
+        return null;
+    }
+
+    private void TryInteract()
+    {
+        InteractableObject item = GetLookedAtInteractable();
+        if (item != null)
+            item.OnInteract(this);
     }
 
     public void PickupItem(CarryableObject item)

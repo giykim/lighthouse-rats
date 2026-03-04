@@ -10,6 +10,8 @@ public class PlayerHUD : NetworkBehaviour
     private TextMeshProUGUI clockText;
     [SerializeField]
     private TextMeshProUGUI dateText;
+    [SerializeField]
+    private TextMeshProUGUI interactText;
 
     public override void OnStartLocalPlayer()
     {
@@ -30,5 +32,18 @@ public class PlayerHUD : NetworkBehaviour
 
         int day = GameClock.Instance.CurrentDay;
         dateText.text = $"Day {day}";
+
+        UpdateInteractPrompt();
+    }
+
+    private void UpdateInteractPrompt()
+    {
+        if (interactText == null)
+        {
+            return;
+        }
+
+        InteractableObject item = GetComponent<PlayerController>().GetLookedAtInteractable();
+        interactText.text = item != null ? item.GetPromptText() : string.Empty;
     }
 }
