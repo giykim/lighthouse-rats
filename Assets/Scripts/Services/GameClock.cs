@@ -25,6 +25,7 @@ public class GameClock : NetworkBehaviour
 
     public static event Action<int> OnDayChanged;
     public static event Action OnServerDayEnd;
+    public static event Action OnServerNewDay;
 
     private void Awake()
     {
@@ -58,6 +59,7 @@ public class GameClock : NetworkBehaviour
             _currentHour = startHour;
             _currentDay++;
             RpcOnDayChanged(_currentDay);
+            OnServerNewDay?.Invoke();
         }
     }
 
@@ -67,6 +69,7 @@ public class GameClock : NetworkBehaviour
         _currentHour = startHour;
         _currentDay++;
         RpcOnDayChanged(_currentDay);
+        OnServerNewDay?.Invoke();
     }
 
     [ClientRpc]

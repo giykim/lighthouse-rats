@@ -61,6 +61,25 @@ public class NPCAI : NetworkBehaviour
         _agent = GetComponent<NavMeshAgent>();
     }
 
+    public override void OnStartServer()
+    {
+        GameClock.OnServerNewDay += OnNewDay;
+    }
+
+    public override void OnStopServer()
+    {
+        GameClock.OnServerNewDay -= OnNewDay;
+    }
+
+    private void OnNewDay()
+    {
+        _target = null;
+        _state = NPCState.Idle;
+        _detectionProgress = 0f;
+        _eventTimer = 0f;
+        _agent.ResetPath();
+    }
+
     public override void OnStartClient()
     {
         if (!isServer)
@@ -91,6 +110,12 @@ public class NPCAI : NetworkBehaviour
 
         foreach (var p in PlayerRegistry.All)
         {
+            PlayerHealth health = p.GetComponent<PlayerHealth>();
+            if (health != null && !health.IsAlive)
+            {
+                continue;
+            }
+
             float distSqr = (p.position - transform.position).sqrMagnitude;
             if (distSqr >= nearestSqr)
             {
@@ -273,6 +298,14 @@ public class NPCAI : NetworkBehaviour
     {
         if (_target == null)
         {
+            return;
+        }
+
+        PlayerHealth targetHealth = _target.GetComponent<PlayerHealth>();
+        if (targetHealth != null && !targetHealth.IsAlive)
+        {
+            _target = null;
+            _state = NPCState.Idle;
             return;
         }
 

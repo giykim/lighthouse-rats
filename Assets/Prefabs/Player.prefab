@@ -862,7 +862,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7385491238816979147
 RectTransform:
   m_ObjectHideFlags: 0
@@ -959,6 +959,7 @@ GameObject:
   - component: {fileID: 7290925774710481293}
   - component: {fileID: 3901121127799215925}
   - component: {fileID: 297632321894819360}
+  - component: {fileID: 365185031743690027}
   - component: {fileID: 5859168611900433862}
   - component: {fileID: 7475441974974919674}
   - component: {fileID: 3591437108752610964}
@@ -1037,6 +1038,27 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+--- !u!114 &365185031743690027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9191299058351913663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0af81f86179632499f35fa58e5c2ef7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpectatorCamera
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  mouseSensitivity: 0.2
+  orbitDistance: 5
+  orbitHeight: 2
+  minDistance: 2
+  maxDistance: 12
+  zoomSpeed: 5
 --- !u!114 &5859168611900433862
 MonoBehaviour:
   m_ObjectHideFlags: 0
