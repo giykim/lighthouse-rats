@@ -20,6 +20,15 @@ public class GameProgress : NetworkBehaviour
         Instance = this;
     }
 
+    public override void OnStartServer()
+    {
+        if (SaveLoadService.Instance != null && SaveLoadService.Instance.HasSave)
+        {
+            foreach (string ev in SaveLoadService.Instance.CurrentSave.completedEvents)
+                _completedEvents.Add(ev);
+        }
+    }
+
     public override void OnStartClient()
     {
         _completedEvents.OnAdd += index => OnEventCompleted?.Invoke(_completedEvents[index]);
@@ -36,4 +45,12 @@ public class GameProgress : NetworkBehaviour
     }
     
     public bool Has(string eventKey) => _completedEvents.Contains(eventKey);
+
+    public string[] GetCompletedEvents()
+    {
+        string[] result = new string[_completedEvents.Count];
+        for (int i = 0; i < _completedEvents.Count; i++)
+            result[i] = _completedEvents[i];
+        return result;
+    }
 }

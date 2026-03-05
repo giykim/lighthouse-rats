@@ -20,8 +20,17 @@ public class GameClock : NetworkBehaviour
     [SyncVar]
     private int _currentDay = 1;
 
+    [SyncVar]
+    private bool _isRunning;
+
     public float CurrentHour => _currentHour;
     public int CurrentDay => _currentDay;
+    public bool IsRunning => _isRunning;
+
+    [Server]
+    public void StartClock() => _isRunning = true;
+
+    public override void OnStopServer() => _isRunning = false;
 
     public static event Action<int> OnDayChanged;
     public static event Action OnServerDayEnd;
@@ -40,15 +49,15 @@ public class GameClock : NetworkBehaviour
     public override void OnStartServer()
     {
         _currentHour = startHour;
-        _currentDay = 1;
+        _currentDay = SaveLoadService.Instance != null && SaveLoadService.Instance.HasSave
+            ? SaveLoadService.Instance.CurrentSave.currentDay
+            : 1;
     }
 
     private void Update()
     {
-        if (!isServer)
-        {
+        if (!isServer || !_isRunning)
             return;
-        }
 
         float hoursPerSecond = HOURS_IN_DAY / dayLengthSeconds;
         _currentHour += hoursPerSecond * Time.deltaTime;

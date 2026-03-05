@@ -13,8 +13,26 @@ public class PlayerHUD : NetworkBehaviour
     [SerializeField]
     private TextMeshProUGUI interactText;
 
+    private void Awake()
+    {
+        hudCanvas.SetActive(false);
+    }
+
     public override void OnStartLocalPlayer()
     {
+        LobbyManager.OnGameStarted += OnGameStarted;
+        if (GameClock.Instance != null && GameClock.Instance.IsRunning)
+            hudCanvas.SetActive(true);
+    }
+
+    public override void OnStopLocalPlayer()
+    {
+        LobbyManager.OnGameStarted -= OnGameStarted;
+    }
+
+    private void OnGameStarted()
+    {
+        LobbyManager.OnGameStarted -= OnGameStarted;
         hudCanvas.SetActive(true);
     }
 

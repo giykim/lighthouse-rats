@@ -74,11 +74,6 @@ public class PlayerController : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        GetComponent<PlayerInput>().enabled = true;
-
         Renderer[] bodyRenderers = bodyMesh.GetComponentsInChildren<Renderer>();
         foreach (Renderer r in bodyRenderers)
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
@@ -87,16 +82,29 @@ public class PlayerController : NetworkBehaviour
         {
             Camera camera = cameraHolder.GetComponentInChildren<Camera>();
             if (camera != null)
-            {
                 camera.enabled = true;
-            }
 
-            AudioListener audioListener = camera.GetComponentInChildren<AudioListener>();
+            AudioListener audioListener = cameraHolder.GetComponentInChildren<AudioListener>();
             if (audioListener != null)
-            {
                 audioListener.enabled = true;
-            }
         }
+
+        LobbyManager.OnGameStarted += OnGameStarted;
+        if (GameClock.Instance != null && GameClock.Instance.IsRunning)
+            OnGameStarted();
+    }
+
+    public override void OnStopLocalPlayer()
+    {
+        LobbyManager.OnGameStarted -= OnGameStarted;
+    }
+
+    private void OnGameStarted()
+    {
+        LobbyManager.OnGameStarted -= OnGameStarted;
+        GetComponent<PlayerInput>().enabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     public void OnMove(InputValue value)
@@ -243,7 +251,7 @@ public class PlayerController : NetworkBehaviour
 
     private void Update()
     {
-        if (!isLocalPlayer)
+        if (!isLocalPlayer || (GameClock.Instance != null && !GameClock.Instance.IsRunning))
         {
             return;
         }
