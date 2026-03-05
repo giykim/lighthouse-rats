@@ -63,6 +63,7 @@ public class NPCAI : NetworkBehaviour
 
     public override void OnStartServer()
     {
+        _agent.ResetPath();
         GameClock.OnServerNewDay += OnNewDay;
     }
 
@@ -91,9 +92,10 @@ public class NPCAI : NetworkBehaviour
     private void Update()
     {
         if (!isServer)
-        {
             return;
-        }
+
+        if (GameClock.Instance == null || !GameClock.Instance.IsRunning)
+            return;
 
         UpdateDetection();
         UpdateState();

@@ -55,6 +55,7 @@ public class PlayerController : NetworkBehaviour
 
     public Transform ItemAnchor => itemAnchor;
     public Transform StorageAnchor => storageAnchor;
+    public CarryableObject CarriedObject => _carriedObject;
 
     private bool _jumpPressed;
     private bool _sprintHeld;

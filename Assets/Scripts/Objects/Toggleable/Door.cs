@@ -44,20 +44,13 @@ public class Door : ToggleableObject
     [Command(requiresAuthority = false)]
     private void CommandTryUnlockWithKey(NetworkIdentity playerIdentity)
     {
-        CarryableObject key = null;
-        foreach (var obj in FindObjectsByType<CarryableObject>(FindObjectsSortMode.None))
-        {
-            if (obj.Carrier == playerIdentity && obj.ItemName == keyName)
-            {
-                key = obj;
-                break;
-            }
-        }
-
-        if (key == null)
-        {
+        PlayerController player = playerIdentity.GetComponent<PlayerController>();
+        if (player == null)
             return;
-        }
+
+        CarryableObject key = player.CarriedObject;
+        if (key == null || key.ItemName != keyName)
+            return;
 
         NetworkServer.Destroy(key.gameObject);
         _isLocked = false;
