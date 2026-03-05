@@ -67,7 +67,7 @@ public class Door : ToggleableObject
         _isAnimating = true;
     }
 
-    public override string GetPromptText()
+    public override string GetPromptText(PlayerController player)
     {
         if (_isLocked)
         {

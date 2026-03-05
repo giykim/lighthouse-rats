@@ -44,7 +44,7 @@ public class TalkableNPC : InteractableObject
         _dialogue = JsonUtility.FromJson<NPCDialogueData>(File.ReadAllText(path));
     }
 
-    public override string GetPromptText() => "Press E to talk";
+    public override string GetPromptText(PlayerController player) => "Press E to talk";
 
     public override void OnInteract(PlayerController player)
     {
@@ -108,7 +108,7 @@ public class TalkableNPC : InteractableObject
         foreach (var line in lines)
         {
             dialogueText.text = line;
-            yield return new WaitForSeconds(secondsPerLine / (DebugService.FastDialogue ? 5f : 1f));
+            yield return new WaitForSeconds(secondsPerLine / (DebugService.FastDialogue ? DebugService.FastDialogueMultiplier : 1f));
         }
         dialogueBubble.SetActive(false);
         dialogueText.text = string.Empty;

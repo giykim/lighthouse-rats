@@ -11,7 +11,7 @@ public class Rope : ClimbableObject
         _ropeGenerator = GetComponent<RopeGenerator>();
     }
 
-    public override string GetPromptText() => "Press E to climb rope";
+    public override string GetPromptText(PlayerController player) => "Press E to climb rope";
 
     public override void OnInteract(PlayerController player)
     {

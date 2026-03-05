@@ -21,7 +21,7 @@ public class PushableObject : InteractableObject
         CommandPush(player.transform.forward);
     }
 
-    public override string GetPromptText()
+    public override string GetPromptText(PlayerController player)
     {
         return "Press E to push";
     }

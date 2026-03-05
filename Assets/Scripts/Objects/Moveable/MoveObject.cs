@@ -40,7 +40,7 @@ public class MoveObject : InteractableObject
         }
     }
 
-    public override string GetPromptText()
+    public override string GetPromptText(PlayerController player)
     {
         return _isDragging ? "Press E to stop dragging" : "Press E to drag";
     }

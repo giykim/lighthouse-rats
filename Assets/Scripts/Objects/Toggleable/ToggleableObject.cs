@@ -38,7 +38,7 @@ public abstract class ToggleableObject : InteractableObject
 
     protected abstract void OnStateChanged(bool isOn);
 
-    public override string GetPromptText()
+    public override string GetPromptText(PlayerController player)
     {
         return _isToggled ? "Press E to close" : "Press E to open";
     }

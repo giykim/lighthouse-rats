@@ -287,7 +287,7 @@ public class PlayerController : NetworkBehaviour
         float speed = _sprintHeld ? sprintMultiplier * moveSpeed : moveSpeed;
         if (DebugService.PlayerSuperspeed)
         {
-            speed *= 5f;
+            speed *= DebugService.SuperspeedMultiplier;
         }
         if (_isDragging) //Reduce speed when pushing/dragging an object
         {

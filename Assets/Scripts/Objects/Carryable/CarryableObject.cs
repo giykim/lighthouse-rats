@@ -42,7 +42,7 @@ public class CarryableObject : InteractableObject
         player.PickupItem(this);
     }
 
-    public override string GetPromptText()
+    public override string GetPromptText(PlayerController player)
     {
         return $"Press E to pick up {itemName}";
     }

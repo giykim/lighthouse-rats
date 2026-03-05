@@ -61,7 +61,8 @@ public class PlayerHUD : NetworkBehaviour
             return;
         }
 
-        InteractableObject item = GetComponent<PlayerController>().GetLookedAtInteractable();
-        interactText.text = item != null ? item.GetPromptText() : string.Empty;
+        PlayerController controller = GetComponent<PlayerController>();
+        InteractableObject item = controller.GetLookedAtInteractable();
+        interactText.text = item != null ? item.GetPromptText(controller) : string.Empty;
     }
 }
