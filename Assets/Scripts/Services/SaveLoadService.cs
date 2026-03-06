@@ -55,7 +55,7 @@ public class SaveLoadService : MonoBehaviour
 
         var data = new SaveData
         {
-            currentDay = GameClock.Instance.CurrentDay,
+            currentDay = GameClock.Instance.CurrentDay + 1,
             completedEvents = GameProgress.Instance.GetCompletedEvents()
         };
 

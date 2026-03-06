@@ -17,12 +17,16 @@ public class SlidableBox : InteractableObject
 
     public override void OnStartServer()
     {
-        if (GameProgress.Instance != null && GameProgress.Instance.Has(progressKey))
-        {
-            _pushed = true;
-            if (waypoints != null && waypoints.Length > 0)
-                transform.position = waypoints[waypoints.Length - 1].position;
-        }
+        if (SaveLoadService.Instance == null || !SaveLoadService.Instance.HasSave)
+            return;
+
+        string[] events = SaveLoadService.Instance.CurrentSave.completedEvents;
+        if (System.Array.IndexOf(events, progressKey) < 0)
+            return;
+
+        _pushed = true;
+        if (waypoints != null && waypoints.Length > 0)
+            transform.position = waypoints[waypoints.Length - 1].position;
     }
 
     public override void OnStartClient()

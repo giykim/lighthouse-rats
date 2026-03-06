@@ -75,6 +75,7 @@ public class GameClock : NetworkBehaviour
     [Server]
     public void AdvanceToNextDay()
     {
+        OnServerDayEnd?.Invoke();
         _currentHour = startHour;
         _currentDay++;
         RpcOnDayChanged(_currentDay);
